@@ -61,7 +61,7 @@ std::shared_ptr<float> FFTFilter::getSpectrumOutput(void)
 void FFTFilter::filter_process(float* in_data, float* out_data, int size, int side)
 {
 	{
-		window.multiplyWithWindowingTable(in_data, size);
+		//window.multiplyWithWindowingTable(in_data, size);
 		// store input for spectrum
 		for (int i = 0; i < size; i++) {
 			fftIn.getData()[i].real(in_data[i]);
