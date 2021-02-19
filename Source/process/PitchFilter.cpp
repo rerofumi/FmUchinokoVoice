@@ -1,6 +1,7 @@
 #pragma once
 #include "PitchFilter.h"
 
+
 PitchFilter::PitchFilter(int segment_length, int buffer_length) :
 	FFTFilter(segment_length, buffer_length)
 	, pitch_table(new int[segment_length])
@@ -22,10 +23,15 @@ PitchFilter::PitchFilter(int segment_length, int buffer_length) :
 	for (auto i = 0; i < base_analyzer_filter_size; i++) {
 		base_freq_filter[i] = 80.0f;
 	}
+	logger = juce::FileLogger::createDefaultAppLogger("logs", "uchinoko_voice.log", "start", 65536000);
+	juce::Logger::setCurrentLogger(logger);
+	juce::Logger::writeToLog("====== test");
 }
 
 PitchFilter::~PitchFilter()
 {
+	juce::Logger::setCurrentLogger(nullptr);
+	delete logger;
 }
 
 void PitchFilter::setFrequencyShift(float pitch, float if_samplerate)
@@ -96,6 +102,9 @@ void PitchFilter::update_table()
 		if (((step_fq * i) < shift_pitch) && (i > 0)) {
 			shift_table.get()[i] = -1;
 		}
+		else if (((i % 2) == 0) && (index == 1)) {
+			shift_table.get()[i] = -1;
+		}
 		else {
 			shift_table.get()[i] = index;
 			index++;
@@ -127,13 +136,18 @@ void PitchFilter::update_table()
 			}
 			else if (fq < (sample_rate / 2.0)) {
 				int new_index = (int)(fq / step_fq);
-				if (new_index != post_index) {
-					formant_table.get()[i] = shift_table.get()[new_index];
-					post_index = new_index;
+				//if (new_index != post_index) {
+				if ((i % 2) != (new_index % 2)) {
+					//formant_table.get()[i] = -1;
+					//continue;
+					new_index += 1;
 				}
-				else {
-					formant_table.get()[i] = -1;
-				}
+				formant_table.get()[i] = shift_table.get()[new_index];
+				post_index = new_index;
+				//}
+				//else {
+				//	formant_table.get()[i] = -1;
+				//}
 				fq += step_shift;
 			}
 			else {
@@ -160,6 +174,13 @@ void PitchFilter::update_table()
 	// update pitch table
 	// -----------------------------
 	{
+#if 0
+		char line[500];
+		for (auto i = 0; i < fft_size; i++) {
+			sprintf_s(line, "%4d = %4d", i, formant_table.get()[i]);
+			juce::Logger::writeToLog(std::string(line));
+		}
+#endif
 		std::lock_guard<std::mutex> lock(flag_lock);
 		for (auto i = 0; i < fft_size; i++) {
 			pitch_table.get()[i] = formant_table.get()[i];
@@ -184,9 +205,9 @@ float PitchFilter::analyze_basefreq()
 	}
 	if (peak > 0) {
 		auto freq1 = (peak) * ((sample_rate / 2.0) / (segment_length / 2.0));
-		auto freq2 = (peak+1) * ((sample_rate / 2.0) / (segment_length / 2.0));
+		auto freq2 = (peak + 1) * ((sample_rate / 2.0) / (segment_length / 2.0));
 		auto pow1 = fftbuf_in.get()[peak];
-		auto pow2 = fftbuf_in.get()[peak+1];
+		auto pow2 = fftbuf_in.get()[peak + 1];
 		freq = (float)((freq1 * pow1 + freq2 * pow2) / ((double)pow1 + (double)pow2));
 		freq = juce::jmax(freq, 60.0f);
 	}
@@ -208,14 +229,16 @@ void PitchFilter::effect(const juce::HeapBlock<juce::dsp::Complex<float>>& in_da
 	{
 		std::lock_guard<std::mutex> lock(flag_lock);
 		// pitch shifting
+		int target;
 		for (int i = 0; i < size; i++) {
 			if (pitch_table.get()[i] < 0) {
 				out_data.get()[i].real(0);
 				out_data.get()[i].imag(0);
 			}
 			else {
-				out_data.get()[i].real(in_data.get()[pitch_table.get()[i]].real());
-				out_data.get()[i].imag(in_data.get()[pitch_table.get()[i]].imag());
+				target = pitch_table.get()[i];
+				out_data.get()[i].real(in_data.get()[target].real());
+				out_data.get()[i].imag(in_data.get()[target].imag());
 			}
 		}
 	}

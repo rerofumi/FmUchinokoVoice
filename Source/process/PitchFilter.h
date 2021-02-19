@@ -4,7 +4,7 @@
 #include <JuceHeader.h>
 
 class PitchFilter :
-    public FFTFilter
+	public FFTFilter
 {
 public:
 	PitchFilter(int segment_length, int buffer_length);
@@ -41,5 +41,6 @@ private:
 	int base_freq_filter_count;
 	float base_freq_filter[16];
 
+	juce::FileLogger* logger;
 };
 

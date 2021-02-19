@@ -10,8 +10,8 @@ public:
 	virtual ~FilterBase();
 
 	/* --- method*/
-	void process(float *buffer_1, float *buffer_2, int size);
-	int output(float* buffer_1, float *buffer_2, int size);
+	void process(float* buffer_1, float* buffer_2, int size);
+	int output(float* buffer_1, float* buffer_2, int size);
 	void setProcessFlag(bool flag);
 	bool getProcessFlag();
 	/* --- member */
@@ -24,11 +24,11 @@ protected:
 	int buffer_length;
 private:
 	/* --- method*/
-	virtual void filter_process(float *in_data, float *out_data, int size, int side);
+	virtual void filter_process(float* in_data, float* out_data, int size, int side);
 	/* --- member */
-	float *input_buffer[2];
-	float *output_buffer[2];
-	float *filter_buffer[2];
+	float* input_buffer[3];
+	float* output_buffer[2];
+	float* filter_buffer[2];
 	int input_pointer;
 	int output_buffer_pointer;
 	int output_pointer;

@@ -23,8 +23,8 @@ protected:
 	std::shared_ptr<float> fftbuf_in, fftbuf_out;
 private:
 	/* --- method*/
-	void filter_process(float *in_data, float *out_data, int size, int side) override;
-	virtual void effect(const juce::HeapBlock<juce::dsp::Complex<float>> &in_data, juce::HeapBlock<juce::dsp::Complex<float>> &out_data, int size, int side);
+	void filter_process(float* in_data, float* out_data, int size, int side) override;
+	virtual void effect(const juce::HeapBlock<juce::dsp::Complex<float>>& in_data, juce::HeapBlock<juce::dsp::Complex<float>>& out_data, int size, int side);
 	/* --- member */
 	std::shared_ptr<float> level;
 	juce::dsp::FFT forwardFFT;
