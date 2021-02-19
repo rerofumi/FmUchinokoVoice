@@ -40,7 +40,5 @@ private:
 	const int base_analyzer_filter_size = 16;
 	int base_freq_filter_count;
 	float base_freq_filter[16];
-
-	juce::FileLogger* logger;
 };
 

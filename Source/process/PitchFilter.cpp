@@ -23,15 +23,10 @@ PitchFilter::PitchFilter(int segment_length, int buffer_length) :
 	for (auto i = 0; i < base_analyzer_filter_size; i++) {
 		base_freq_filter[i] = 80.0f;
 	}
-	logger = juce::FileLogger::createDefaultAppLogger("logs", "uchinoko_voice.log", "start", 65536000);
-	juce::Logger::setCurrentLogger(logger);
-	juce::Logger::writeToLog("====== test");
 }
 
 PitchFilter::~PitchFilter()
 {
-	juce::Logger::setCurrentLogger(nullptr);
-	delete logger;
 }
 
 void PitchFilter::setFrequencyShift(float pitch, float if_samplerate)
@@ -174,13 +169,6 @@ void PitchFilter::update_table()
 	// update pitch table
 	// -----------------------------
 	{
-#if 0
-		char line[500];
-		for (auto i = 0; i < fft_size; i++) {
-			sprintf_s(line, "%4d = %4d", i, formant_table.get()[i]);
-			juce::Logger::writeToLog(std::string(line));
-		}
-#endif
 		std::lock_guard<std::mutex> lock(flag_lock);
 		for (auto i = 0; i < fft_size; i++) {
 			pitch_table.get()[i] = formant_table.get()[i];
