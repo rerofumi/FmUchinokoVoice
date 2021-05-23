@@ -8,7 +8,8 @@ PitchFilter::PitchFilter(int segment_length, int buffer_length) :
 	, formant_table(new int[segment_length])
 	, shift_table(new int[segment_length])
 	, level(new float[spectrumNum])
-	, shift_pitch(0.0)
+	, shift_freq(0.0)
+	, pitch_shift(0.0)
 	, formant_shift(0.0)
 	, sample_rate(48000.0)
 	, voice_basefreq(80.0)
@@ -31,7 +32,14 @@ PitchFilter::~PitchFilter()
 
 void PitchFilter::setFrequencyShift(float pitch, float if_samplerate)
 {
-	shift_pitch = pitch;
+	shift_freq = pitch;
+	sample_rate = if_samplerate;
+	update_table();
+}
+
+void PitchFilter::setPitchShift(float slide, float if_samplerate)
+{
+	pitch_shift = slide;
 	sample_rate = if_samplerate;
 	update_table();
 }
@@ -94,7 +102,7 @@ void PitchFilter::update_table()
 	// -----------------------------
 	int index = 0;
 	for (auto i = 0; i < fq_size; i++) {
-		if (((step_fq * i) < shift_pitch) && (i > 0)) {
+		if (((step_fq * i) < shift_freq) && (i > 0)) {
 			shift_table.get()[i] = -1;
 		}
 		else if (((i % 2) == 0) && (index == 1)) {
@@ -106,17 +114,27 @@ void PitchFilter::update_table()
 		}
 	}
 	// -----------------------------
-	// formant shift
+	// pitch shift
 	// -----------------------------
-	float step_shift = step_fq;
-	if (formant_shift < 0) {
+	float step_shift1 = step_fq;
+	float step_shift2 = step_fq;
+	if (pitch_shift < 0) {
 		// shift to lower
-		step_shift = (float)(step_fq * (1.0f - (formant_shift * 0.4)));
+		step_shift1 = (float)(step_fq * (1.0f - pitch_shift));
 	}
 	else {
 		// shift to higher
-		step_shift = (float)(step_fq / (1.0f + (formant_shift * 0.4)));
+		step_shift1 = (float)(step_fq / (1.0f + pitch_shift));
 	}
+	if (formant_shift < 0) {
+		// shift to lower
+		step_shift2 = (float)(step_shift1 * (1.0f - formant_shift));
+	}
+	else {
+		// shift to higher
+		step_shift2 = (float)(step_shift1 / (1.0f + formant_shift));
+	}
+	// - build table
 	{
 		float fq = 0.0f;
 		int post_index = 0;
@@ -125,25 +143,27 @@ void PitchFilter::update_table()
 				formant_table.get()[i] = 0;
 				fq += step_fq;
 			}
-			else if ((step_fq * i) < (voice_basefreq + shift_pitch)) {
-				formant_table.get()[i] = -1;
-				fq += step_fq;
-			}
-			else if (fq < (sample_rate / 2.0)) {
+			//			else if ((step_fq * i) < (voice_basefreq + shift_freq)) {
+			//				formant_table.get()[i] = -1;
+			//				fq += step_fq;
+			//			}
+			else if (fq < voice_basefreq) {
 				int new_index = (int)(fq / step_fq);
-				//if (new_index != post_index) {
 				if ((i % 2) != (new_index % 2)) {
-					//formant_table.get()[i] = -1;
-					//continue;
 					new_index += 1;
 				}
 				formant_table.get()[i] = shift_table.get()[new_index];
 				post_index = new_index;
-				//}
-				//else {
-				//	formant_table.get()[i] = -1;
-				//}
-				fq += step_shift;
+				fq += step_shift1;
+			}
+			else if (fq < (sample_rate / 2.0)) {
+				int new_index = (int)(fq / step_fq);
+				if ((i % 2) != (new_index % 2)) {
+					new_index += 1;
+				}
+				formant_table.get()[i] = shift_table.get()[new_index];
+				post_index = new_index;
+				fq += step_shift2;
 			}
 			else {
 				formant_table.get()[i] = -1;

@@ -43,7 +43,7 @@ namespace ProjectInfo
 {
     const char* const  projectName    = "fm_uchinoko_voice";
     const char* const  companyName    = "fumi2kick";
-    const char* const  versionString  = "0.1.0";
-    const int          versionNumber  = 0x100;
+    const char* const  versionString  = "0.2.0";
+    const int          versionNumber  = 0x200;
 }
 #endif

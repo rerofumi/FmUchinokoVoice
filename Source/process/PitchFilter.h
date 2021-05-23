@@ -12,6 +12,7 @@ public:
 
 	/* --- method*/
 	void setFrequencyShift(float pitch, float if_samplerate);
+	void setPitchShift(float slide, float if_samplerate);
 	void setFormantShift(float slide, float if_samplerate);
 	std::shared_ptr<float> getFormantShift(void);
 	void setBaseFrequency(float freq);
@@ -31,7 +32,8 @@ private:
 	std::shared_ptr<int> shift_table;
 	std::shared_ptr<float> level;
 	std::shared_ptr<float> analyze_buffer;
-	float shift_pitch;
+	float shift_freq;
+	float pitch_shift;
 	float formant_shift;
 	float sample_rate;
 	float voice_basefreq;
