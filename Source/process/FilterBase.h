@@ -26,7 +26,7 @@ private:
 	/* --- method*/
 	virtual void filter_process(float* in_data, float* out_data, int size, int side);
 	/* --- member */
-	float* input_buffer[3];
+	float* input_buffer[4];
 	float* output_buffer[2];
 	float* filter_buffer[2];
 	int input_pointer;

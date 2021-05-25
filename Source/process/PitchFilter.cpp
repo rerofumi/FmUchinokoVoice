@@ -176,13 +176,14 @@ void PitchFilter::update_table()
 	// -----------------------------
 	formant_table.get()[0] = 0;
 	formant_table.get()[fq_size] = fq_size;
-	for (auto i = 0; i < fq_size - 1; i++) {
-		int sindex = formant_table.get()[i + 1];
+	formant_table.get()[fft_size - 1] = fft_size - 1;
+	for (auto i = 1; i < fq_size - 1; i++) {
+		int sindex = formant_table.get()[i];
 		if (sindex == -1) {
-			formant_table.get()[fft_size - 1 - i] = sindex;
+			formant_table.get()[fft_size - i] = -1;
 		}
 		else {
-			formant_table.get()[fft_size - 1 - i] = fft_size - sindex;
+			formant_table.get()[fft_size - i] = fft_size - sindex;
 		}
 	}
 	// -----------------------------

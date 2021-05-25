@@ -106,12 +106,12 @@ PluginView::~PluginView()
 void PluginView::paint (juce::Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
-	if (processer->isUpdateParameter()) {
-		PitchSlider.get()->setValue(processer->getFrequencyShift());
-		PitchShiftSlider.get()->setValue(processer->getPitchShift());
-		FormantShiftSlider.get()->setValue(processer->getFormantShift());
-		BaseFreqSlider.get()->setValue(processer->getBaseFrequency());
-	}
+	//if (processer->isUpdateParameter()) {
+	PitchSlider.get()->setValue(processer->getFrequencyShift());
+	PitchShiftSlider.get()->setValue(processer->getPitchShift());
+	FormantShiftSlider.get()->setValue(processer->getFormantShift());
+	BaseFreqSlider.get()->setValue(processer->getBaseFrequency());
+	//}
     //[/UserPrePaint]
 
     g.fillAll (juce::Colour (0xff323e44));

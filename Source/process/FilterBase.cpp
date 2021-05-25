@@ -10,6 +10,7 @@ FilterBase::FilterBase(int segment_length, int buffer_length) :
 	input_buffer[0] = new float[segment_length];
 	input_buffer[1] = new float[segment_length];
 	input_buffer[2] = new float[segment_length];
+	input_buffer[3] = new float[segment_length];
 	output_buffer[0] = new float[buffer_length];
 	output_buffer[1] = new float[buffer_length];
 	filter_buffer[0] = new float[segment_length];
@@ -21,6 +22,7 @@ FilterBase::~FilterBase()
 	delete[] input_buffer[0];
 	delete[] input_buffer[1];
 	delete[] input_buffer[2];
+	delete[] input_buffer[3];
 	delete[] output_buffer[0];
 	delete[] output_buffer[1];
 	delete[] filter_buffer[0];
@@ -57,17 +59,14 @@ void FilterBase::process(float* buffer_1, float* buffer_2, int size)
 			setProcessFlag(true);
 		}
 		else if (input_pointer == segment_length / 2) {
-			int shift = segment_length / 2 + 1;
+			int shift = segment_length / 2;
 			for (size_t i = 0; i < segment_length; i++) {
 				input_buffer[2][i] = input_buffer[0][shift];
+				input_buffer[3][i] = input_buffer[1][shift];
 				shift = (shift + 1) % segment_length;
 			}
 			filter_process(input_buffer[2], filter_buffer[0], segment_length, 0);
-			for (size_t i = 0; i < segment_length; i++) {
-				input_buffer[2][i] = input_buffer[1][shift];
-				shift = (shift + 1) % segment_length;
-			}
-			filter_process(input_buffer[2], filter_buffer[1], segment_length, 1);
+			filter_process(input_buffer[3], filter_buffer[1], segment_length, 1);
 			int offset = segment_length / 4;
 			for (size_t i = 0; i < segment_length / 2; i++) {
 				output_buffer[0][output_buffer_pointer] = filter_buffer[0][i + offset];

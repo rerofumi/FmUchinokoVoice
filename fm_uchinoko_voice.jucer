@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="eGMJA7" name="fm_uchinoko_voice" projectType="audioplug"
               useAppConfig="0" addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1"
-              version="0.3.0" companyName="fumi2kick" pluginFormats="buildStandalone,buildVST3"
+              version="0.3.1" companyName="fumi2kick" pluginFormats="buildStandalone,buildVST3"
               pluginVST3Category="Fx,Pitch Shift">
   <MAINGROUP id="M2EWMm" name="fm_uchinoko_voice">
     <GROUP id="{1A5EE93C-B4D5-90C4-8594-B7AB4959054D}" name="Source">
